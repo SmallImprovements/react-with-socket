@@ -14,11 +14,13 @@ const withSocket = (createListeners, url = '') => (component) => {
             const listeners = createListeners(); // pass props, update when new props come in
             Object.keys(listeners).forEach((event) => {
                 this.socket.on(event, (data) => {
-                    console.log('event', data);
                     const nextProps = listeners[event](data);
                     this.setState((prevState) => ({
-                        ...prevState.props,
-                        ...nextProps
+                        ...prevState.state,
+                        props: {
+                            ...prevState.props,
+                            ...nextProps
+                        }
                     }));
                 })
             });
