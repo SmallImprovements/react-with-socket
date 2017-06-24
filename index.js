@@ -1,4 +1,5 @@
 import { Component, createElement } from 'react';
+import hoistStatics from 'hoist-non-react-statics';
 
 const config = {
   base: '',
@@ -66,7 +67,7 @@ const withSocket = (
     }
   }
 
-  return SocketWrapper;
+  return hoistStatics(SocketWrapper, component);
 };
 
 export default withSocket;
