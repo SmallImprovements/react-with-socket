@@ -10,7 +10,8 @@ export const setSocketBase = (base) => { config.base = base; };
 export const setSocketConstructor = (constructor) => { config.constructor = constructor; };
 export const setSocketConfig = (nextConfig) => Object.assign(config, nextConfig);
 
-const standardSocket = (url) => () => config.constructor(`${config.base}/${url}`);
+export const standardSocket = (url) => () => config.constructor(`${config.base}/${url}`);
+
 const emptyMap = () => ({});
 const emptyActions = (emit) => ({ emit });
 
