@@ -1,11 +1,15 @@
-import io from 'socket.io-client';
 import { Component, createElement } from 'react';
 
 const config = {
-    base: 'localhost:8090'
+    base: '',
+    constructor: () => { throw new Error('No constructor defined'); },
 };
 
-const standardSocket = (url) => () => io(`${config.base}/${url}`)
+export const setSocketBase = (base) => { config.base = base; }
+export const setSocketConstructor = (constructor) => { config.constructor = constructor; }
+export const setSocketConfig = (nextConfig) => Object.assign(config, nextConfig);
+
+const standardSocket = (url) => () => config.constructor(`${config.base}/${url}`)
 const emptyMap = () => ({});
 const emptyActions = (emit) => ({ emit });
 
@@ -23,7 +27,7 @@ const withSocket = (
 
         componentWillMount() {
             this.socket = createSocket();
-            const listeners = createListeners();
+            const listeners = createListeners(this.props);
             const callbacks = createCallbacks();
 
             Object.keys(listeners).forEach((event) => {
