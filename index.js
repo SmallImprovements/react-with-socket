@@ -3,12 +3,18 @@ import { Component, createElement } from 'react';
 
 const getSocket = (url) => io(`localhost:8090/${url}`);
 
-const withSocket = (createListeners, createCallbacks = () => ({}), url = '') => (component) => {
+const withSocket = (
+    createListeners,
+    createActions,
+    createCallbacks = () => ({}),
+    url = ''
+) => (component) => {
     class SocketWrapper extends Component {
         constructor(props) {
             super(props);
             this.state = { props: {} };
         }
+        
         componentWillMount() {
             this.socket = getSocket(url);
             const listeners = createListeners(); // pass props, update when new props come in
@@ -25,12 +31,14 @@ const withSocket = (createListeners, createCallbacks = () => ({}), url = '') => 
                             ...nextProps
                         }
                     });
+
                     const onUpdate = () => {
                         const callback = callbacks[event];
                         if (callback) {
                             callback(data, this.state.props);
                         }
                     };
+
                     this.setState(updater, onUpdate);
                 })
             });
@@ -42,7 +50,10 @@ const withSocket = (createListeners, createCallbacks = () => ({}), url = '') => 
 
         render() {
             const emit = (...args) => { this.socket.emit(...args); }
-            return createElement(component, { ...this.props, ...this.state.props, emit });
+            const { props } = this.state;
+            const nextProps = { ...this.props, ...this.stateProps };
+            const actionProps = createActions ? createActions(emit, nextProps) : { emit };
+            return createElement(component, { ...nextProps, ...actionProps });
         }
     }
 
