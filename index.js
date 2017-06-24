@@ -14,22 +14,23 @@ const standardSocket = (url) => () => config.constructor(`${config.base}/${url}`
 const emptyMap = () => ({});
 const emptyActions = (emit) => ({ emit });
 
-const withSocket = (
-  createListeners = emptyMap,
-  createActions = emptyActions,
-  createCallbacks = emptyMap,
+const withSocket = ({
+  mapData = emptyMap,
+  mapEmit = emptyActions,
+  initialState = {},
+  callbacks = emptyMap,
   createSocket = standardSocket('')
-) => (component) => {
+} = {}) => (component) => {
   class SocketWrapper extends Component {
     constructor(props) {
       super(props);
-      this.state = { props: {} };
+      this.state = { props: initialState };
     }
 
     componentWillMount() {
       this.socket = createSocket();
-      const listeners = createListeners(this.props);
-      const callbacks = createCallbacks();
+      const listeners = mapData(this.props);
+      const cbs = callbacks();
 
       Object.keys(listeners).forEach((event) => {
         this.socket.on(event, (data) => {
@@ -45,7 +46,7 @@ const withSocket = (
           };
 
           const onUpdate = () => {
-            const callback = callbacks[event];
+            const callback = cbs[event];
             if (callback) {
               callback(data, this.state.props);
             }
@@ -63,7 +64,7 @@ const withSocket = (
     render() {
       const emit = (...args) => { this.socket.emit(...args); };
       const nextProps = { ...this.props, ...this.state.props };
-      return createElement(component, { ...nextProps, ...createActions(emit, nextProps) });
+      return createElement(component, { ...nextProps, ...mapEmit(emit, nextProps) });
     }
   }
 
