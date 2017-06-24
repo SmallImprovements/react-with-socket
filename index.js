@@ -23,20 +23,22 @@ const withSocket = (
 
         componentWillMount() {
             this.socket = createSocket();
-            const listeners = createListeners(); // pass props, update when new props come in
+            const listeners = createListeners();
             const callbacks = createCallbacks();
 
             Object.keys(listeners).forEach((event) => {
                 this.socket.on(event, (data) => {
-                    const nextProps = listeners[event](data);
 
-                    const updater = (prevState) => ({
-                        ...prevState.state,
-                        props: {
-                            ...prevState.props,
-                            ...nextProps
-                        }
-                    });
+                    const updater = (prevState) => {
+                        const nextProps = listeners[event](data, { ...this.props, ...prevState.props });
+                        return {
+                            ...prevState.state,
+                            props: {
+                                ...prevState.props,
+                                ...nextProps
+                            }
+                        };
+                    }
 
                     const onUpdate = () => {
                         const callback = callbacks[event];
@@ -51,7 +53,7 @@ const withSocket = (
         }
 
         componentWillUnmount() {
-            this.socket().close();
+            this.socket.close();
         }
 
         render() {
