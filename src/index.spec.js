@@ -6,6 +6,9 @@ import sinon from 'sinon';
 
 import withSocket, { setSocketConstructor } from '.';
 
+const delay = () => new Promise(res => setTimeout(() => res(), 1));
+
+
 const nullComp = () => null;
 const noop = () => {};
 const spyComponent = () => sinon.stub().returns(null);
@@ -75,6 +78,16 @@ describe('withSocket', () => {
     const renderedComp = ReactDOM.render(createElement(comp, {}), container);
     ReactDOM.unmountComponentAtNode(container);
     expect(renderedComp.socket.close).to.have.been.called;
+  });
+
+  it('can optionally keep the socket alive on unmount', () => {
+    const socketSpy = spySocketConstructor();
+    setSocketConstructor(socketSpy);
+    const container = global.document.createElement('div');
+    const comp = withSocket({ keepAlive: true })(nullComp);
+    const renderedComp = ReactDOM.render(createElement(comp, {}), container);
+    ReactDOM.unmountComponentAtNode(container);
+    expect(renderedComp.socket.close).not.to.have.been.called;
   });
 
   it('renders the given component', () => {
@@ -185,6 +198,43 @@ describe('withSocket', () => {
     expect(spy).to.have.been.calledWith(sinon.match({
       mappedData: testData
     }));
+  });
+
+  it('allows to override the socket constructor, which has access to props', () => {
+    const otherSpySocket = sinon.spy();
+    setSocketConstructor(spySocketConstructor);
+    const comp = withSocket({
+      createSocket: (props) => otherSpySocket(props)
+    })(nullComp);
+
+    const props = { x: 1 };
+
+    render(comp, props);
+
+    expect(otherSpySocket).to.have.been.calledWith(sinon.match(props));
+  });
+
+  it('passes an updateProps fn to update outside of sockets - (think optimistic updates)', () => {
+    const spy = spyComponent();
+    setSocketConstructor(mockSocketConstructor);
+    const comp = withSocket({
+      initialState: { msgs: [] }
+    })((props) => {
+      spy(props);
+      if (!props.msgs.length) {
+        // fake user interaction by calling something with a delay
+        setTimeout(() => {
+          props.updateProps({ msgs: [1] });
+        });
+      }
+      return null;
+    });
+
+    render(comp, {});
+
+    return delay().then(() => {
+      expect(spy).to.have.been.calledTwice;
+    });
   });
 });
 
