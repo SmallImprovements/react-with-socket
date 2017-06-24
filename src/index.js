@@ -56,7 +56,7 @@ const withSocket = ({
           const onUpdate = () => {
             const callback = cbs[event];
             if (callback) {
-              callback(data, { ...this.state.props, emit: (...args) => this.emit(...args) });
+              callback(data, this.mergeProps(this.state.props));
             }
           };
 
@@ -75,14 +75,18 @@ const withSocket = ({
       this.socket.emit(...args);
     }
 
-    render() {
-      const updateProps = (nextProps) => this.update(nextProps);
-      const nextProps = { ...this.props, ...this.state.props };
-      return createElement(component, {
+    mergeProps(nextProps) {
+      const updateProps = (nP) => this.update(nP);
+      return {
         ...nextProps,
         ...mapEmit((...args) => this.emit(...args), { ...nextProps, updateProps }),
         updateProps
-      });
+      }
+    }
+
+    render() {
+      const nextProps = { ...this.props, ...this.state.props };
+      return createElement(component, this.mergeProps(nextProps));
     }
   }
 
