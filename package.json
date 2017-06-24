@@ -4,10 +4,10 @@
   "description": "Higher Order Component to communicate with sockets",
   "main": "dist/index.js",
   "scripts": {
-    "build": "babel index.js --out-file dist/index.js",
-    "lint": "eslint index.js",
+    "build": "babel src --out-dir dist --ignore=**/*.spec.js",
+    "lint": "eslint src",
     "prepublish": "npm run lint && npm run test && npm run build",
-    "test": "mocha --compilers js:babel-register --reporter spec *.spec.js '**/*.spec.js' --require mocha.config"
+    "test": "mocha --compilers js:babel-register --reporter spec src/*.spec.js 'src/**/*.spec.js' --require mocha.config"
   },
   "keywords": [
     "react",
