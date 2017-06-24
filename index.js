@@ -1,22 +1,28 @@
 import io from 'socket.io-client';
 import { Component, createElement } from 'react';
 
-const getSocket = (url) => io(`localhost:8090/${url}`);
+const config = {
+    base: 'localhost:8090'
+};
+
+const standardSocket = (url) => () => io(`${config.base}/${url}`)
+const emptyMap = () => ({});
+const emptyActions = (emit) => ({ emit });
 
 const withSocket = (
-    createListeners,
-    createActions,
-    createCallbacks = () => ({}),
-    url = ''
+    createListeners = emptyMap,
+    createActions = emptyActions,
+    createCallbacks = emptyMap,
+    createSocket = standardSocket('')
 ) => (component) => {
     class SocketWrapper extends Component {
         constructor(props) {
             super(props);
             this.state = { props: {} };
         }
-        
+
         componentWillMount() {
-            this.socket = getSocket(url);
+            this.socket = createSocket();
             const listeners = createListeners(); // pass props, update when new props come in
             const callbacks = createCallbacks();
 
@@ -50,10 +56,8 @@ const withSocket = (
 
         render() {
             const emit = (...args) => { this.socket.emit(...args); }
-            const { props } = this.state;
-            const nextProps = { ...this.props, ...this.stateProps };
-            const actionProps = createActions ? createActions(emit, nextProps) : { emit };
-            return createElement(component, { ...nextProps, ...actionProps });
+            const nextProps = { ...this.props, ...this.state.props };
+            return createElement(component, { ...nextProps, ...createActions(emit, nextProps) });
         }
     }
 
