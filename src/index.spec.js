@@ -178,6 +178,37 @@ describe('withSocket', () => {
     }));
   });
 
+
+  it('passed down action functions can use updateProps to update immediately', () => {
+    const spy = spyComponent();
+    setSocketConstructor(mockSocketConstructor);
+    const initialState = { x: 1 };
+    const testArg = 'a';
+    const comp = withSocket({
+      initialState,
+      mapEmit: (emit, props) => ({
+        actions: {
+          test: (arg) => {
+            emit('test', { props, arg });
+            props.updateProps({ y: 2 });
+          }
+        }
+      })
+    })(({ actions, y }) => {
+      spy(y);
+      setTimeout(() => {
+        actions.test(testArg);
+      });
+      return null;
+    });
+
+    render(comp, {});
+
+    return delay().then(() => {
+      expect(spy).to.have.been.calledWith(2);
+    });
+  });
+
   it('maps new incoming data and updates', () => {
     const spy = spyComponent();
     setSocketConstructor(mockSocketConstructor);

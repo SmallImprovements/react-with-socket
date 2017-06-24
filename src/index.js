@@ -75,7 +75,11 @@ const withSocket = ({
       const emit = (...args) => { this.socket.emit(...args); };
       const updateProps = (nextProps) => this.update(nextProps);
       const nextProps = { ...this.props, ...this.state.props };
-      return createElement(component, { ...nextProps, ...mapEmit(emit, nextProps), updateProps });
+      return createElement(component, {
+        ...nextProps,
+        ...mapEmit(emit, { ...nextProps, updateProps }),
+        updateProps
+      });
     }
   }
 
