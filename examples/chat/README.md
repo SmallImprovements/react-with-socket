@@ -28,3 +28,9 @@ on website load.
 - Users can type chat messages to the chat room.
 - A notification is sent to all users when a user joins or leaves
 the chatroom.
+
+## Benefits
+
+- The `withSocket` higher order component shields away all socket related code from
+  your components.
+- Your components can remain stateless and purely presentational
