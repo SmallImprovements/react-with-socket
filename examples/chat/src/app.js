@@ -1,21 +1,16 @@
 import { Component } from 'react';
-import io from 'socket.io-client';
-import withSocket, { setSocketConfig } from '../../../src';
+import withSocket from '../../../src';
 import EmptyFormInput from './components/EmptyFormInput';
 import ChatInput from './components/ChatInput';
 import { noop, omit, getColorByString } from './util';
 
 import './style.css';
 
-setSocketConfig({
-  constructor: io
-});
-
-
 const toLogMsg = (message) => ({
   type: 'log',
   message
 });
+
 const toMsg = (username, message) => ({
   type: 'message',
   username,
@@ -105,7 +100,7 @@ export default withSocket({
 
 function Login({ onSubmit }) {
   return (
-    <div className="login page">
+    <div className="login">
       <div className="form">
         <h3 className="title">{ `What's your nickname?` }</h3>
         <EmptyFormInput inputClassName="usernameInput" onSubmit={onSubmit} />
@@ -135,10 +130,9 @@ function Messages({ messages }) {
   return (
     <ul className="messages">
       { messages.map(({ type, username, message, color }, i) => {
-        if (type === 'log') {
-          return <li className="log" key={i}>{message}</li>;
-        }
-        return <li key={i}><Username name={username} color={color}/>{message}</li>;
+        return type === 'log' ?
+          <li className="log" key={i}>{message}</li> :
+          <li key={i}><Username name={username} color={color}/>{message}</li>;
       })}
     </ul>
   );
@@ -158,10 +152,6 @@ function Status({ typingUsers, numUsers }) {
   }
   const participants = `${numUsers} participant${numUsers === 1 ? '' : 's'}`
   const typing = getTypingText();
-  return (
-    <div className="status">
-      { typing } { typing ? '-' : '' } { participants }
-    </div>
-  );
+  return <div className="status">{ typing } { typing ? '-' : '' } { participants }</div>;
 }
 
