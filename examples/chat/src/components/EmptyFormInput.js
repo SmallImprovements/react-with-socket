@@ -8,12 +8,13 @@ export default class EmptyFormInput extends Component {
   }
   render() {
     const { value } = this.state;
-    const { placeholder, onChange = noop } = this.props;
+    const { placeholder, onChange = noop, inputClassName } = this.props;
     const onSubmit = (event) => {
       event.preventDefault();
       event.stopPropagation();
       if (value) {
         this.props.onSubmit(value);
+        console.log('removal');
         this.setState({ value: '' });
       }
     };
@@ -25,7 +26,12 @@ export default class EmptyFormInput extends Component {
 
     return (
       <form onSubmit={ onSubmit }>
-        <input value={value} onChange={onInput} placeholder={placeholder} />
+        <input
+          className={inputClassName}
+          value={value}
+          onChange={onInput}
+          placeholder={placeholder}
+        />
       </form>
     );
   }

@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import withSocket, { setSocketConfig } from '../../../src';
 import EmptyFormInput from './components/EmptyFormInput';
 import ChatInput from './components/ChatInput';
-import { noop, omit } from './util';
+import { noop, omit, getColorByString } from './util';
 
 import './style.css';
 
@@ -11,19 +11,6 @@ setSocketConfig({
   constructor: io
 });
 
-const COLORS = [
-  '#e21400', '#91580f', '#f8a700', '#f78b00',
-  '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-  '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-];
-
-const getUsernameColor = () => {
-  let hash = 7;
-  for (var i = 0; i < username.length; i++) {
-    hash = username.charCodeAt(i) + (hash << 5) - hash;
-  }
-  return COLORS[Math.abs(hash % COLORS.length)];
-};
 
 const toLogMsg = (message) => ({
   type: 'log',
@@ -33,7 +20,7 @@ const toMsg = (username, message) => ({
   type: 'message',
   username,
   message,
-  color: getUsernameColor(username)
+  color: getColorByString(username)
 });
 
 const initialState = {
@@ -64,7 +51,7 @@ const mapData = () => ({
     typingUsers: omit(username, typingUsers)
   }),
   'typing': ({ username }, { typingUsers }) => ({
-    typingUsers: { ...typingUsers, username: true }
+    typingUsers: { ...typingUsers, [username]: true }
   }),
   'stop typing': ({ username }, { typingUsers }) => ({
     typingUsers: omit(username, typingUsers)
@@ -92,7 +79,7 @@ const mapEmit = (emit, props) => ({
     sendMessage: (message) => {
       emit('new message', message);
       props.updateProps({
-        messages: [...props.messages, { username: props.username, message }]
+        messages: [...props.messages, toMsg(props.username, message) ]
       });
     },
     type: (isTyping) => emit(isTyping ? 'typing' : 'stop typing')
@@ -108,51 +95,73 @@ export default withSocket({
   username,
   messages,
   typingUsers,
+  numUsers,
   actions: { login, sendMessage, type },
 }) => {
-  if (!username) {
-    return <Login onSubmit={ login } />
-  }
-  return <Chat messages={ messages } typingUsers={ typingUsers } onType={type} onSend={sendMessage} />
+  return username ?
+    <Chat messages={ messages } numUsers={numUsers} typingUsers={ typingUsers } onType={type} onSend={sendMessage} /> :
+    <Login onSubmit={ login } />
 });
 
 function Login({ onSubmit }) {
   return (
-    <EmptyFormInput onSubmit={onSubmit} />
+    <div className="login page">
+      <div className="form">
+        <h3 className="title">{ `What's your nickname?` }</h3>
+        <EmptyFormInput inputClassName="usernameInput" onSubmit={onSubmit} />
+      </div>
+    </div>
   );
 }
 
-function Chat({ messages, typingUsers, onType, onSend }) {
+function Chat({ messages, typingUsers, numUsers, onType, onSend }) {
   return (
     <div>
-      <Messages messages={ messages } />
-      <TypingUsers typingUsers={ Object.keys(typingUsers) } />
-      <ChatInput onSubmit={onSend} onType={onType} />
+      <div className="chatArea">
+        <Messages messages={ messages } />
+      </div>
+      <Status typingUsers={ Object.keys(typingUsers) } numUsers={numUsers} />
+      <ChatInput
+        inputClassName="inputMessage"
+        placeholder="Type here..."
+        onSubmit={onSend}
+        onType={onType}
+      />
     </div>
   );
 }
 
 function Messages({ messages }) {
   return (
-    <ul>
+    <ul className="messages">
       { messages.map(({ type, username, message, color }, i) => {
         if (type === 'log') {
-          return <li key={i}>{message}</li>;
+          return <li className="log" key={i}>{message}</li>;
         }
-        return <li key={i}><span>{username}</span>{message}</li>;
+        return <li key={i}><Username name={username} color={color}/>{message}</li>;
       })}
     </ul>
   );
 }
 
-function TypingUsers({ typingUsers }) {
-  const getText = () => {
+function Username({ name, color }) {
+  return <span className="username" style={{ color }}>{ name }</span>;
+}
+
+function Status({ typingUsers, numUsers }) {
+  const getTypingText = () => {
     const count = typingUsers.length;
     if (!count) { return ''; }
-    if (count === 1) { return `${typingUsers[0]} is typing}`; }
+    if (count === 1) { return `${typingUsers[0]} is typing`; }
     if (count < 4) { return `${typingUsers.join(', ')} are typing}`; }
     return `${count} users are typing`;
   }
-  return <div>{ getText() }</div>;
+  const participants = `${numUsers} participant${numUsers === 1 ? '' : 's'}`
+  const typing = getTypingText();
+  return (
+    <div className="status">
+      { typing } { typing ? '-' : '' } { participants }
+    </div>
+  );
 }
 

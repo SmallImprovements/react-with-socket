@@ -26,6 +26,7 @@ export default class ChatInput extends Component {
   render() {
     return (
       <EmptyFormInput
+        inputClassName={this.props.inputClassName}
         onSubmit={(msg) => this.submit(msg) }
         onChange={() => this.type() }
       />
