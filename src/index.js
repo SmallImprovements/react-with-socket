@@ -81,7 +81,7 @@ const withSocket = ({
         ...nextProps,
         ...mapEmit((...args) => this.emit(...args), { ...nextProps, updateProps }),
         updateProps
-      }
+      };
     }
 
     render() {
