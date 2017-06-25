@@ -49,10 +49,10 @@ module.exports = {
       disableDotRule: true
     },
     proxy: {
-      '/api': {
+      '/socket.io': {
         target: 'http://localhost:3001',
         secure: false
-      },
+      }
     }
   }
 };

@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import EmptyFormInput from './EmptyFormInput';
 
+const TYPING_TIMER_LENGTH = 400;
+
 export default class ChatInput extends Component {
   type() {
     const { typing, typingTimeout } = this;
@@ -11,7 +13,6 @@ export default class ChatInput extends Component {
   }
 
   stopTyping() {
-    this.
     clearTimeout(this.typingTimeout);
     this.props.onType(false);
     this.typing = false;
@@ -19,7 +20,7 @@ export default class ChatInput extends Component {
 
   submit(msg) {
     this.stopTyping();
-    onSubmit(msg);
+    this.props.onSubmit(msg);
   }
 
   render() {

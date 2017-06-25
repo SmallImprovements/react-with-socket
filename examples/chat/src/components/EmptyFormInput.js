@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { noop } from '../util';
 
 export default class EmptyFormInput extends Component {
   constructor() {
@@ -10,6 +11,7 @@ export default class EmptyFormInput extends Component {
     const { placeholder, onChange = noop } = this.props;
     const onSubmit = (event) => {
       event.preventDefault();
+      event.stopPropagation();
       if (value) {
         this.props.onSubmit(value);
         this.setState({ value: '' });
