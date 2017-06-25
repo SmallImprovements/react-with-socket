@@ -1,6 +1,6 @@
 {
   "name": "react-with-socket",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Higher Order Component to communicate with sockets",
   "main": "dist/index.js",
   "scripts": {
