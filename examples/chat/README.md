@@ -1,22 +1,27 @@
 
-# Socket.IO Chat
+# Socket.IO Chat -> using react-with-socket
 
-A simple chat demo for socket.io
+This is the same chat demo as [here](https://github.com/socketio/socket.io/tree/master/examples/chat), just replacing the frontend with a React version using the library provided in this repository.
 
-## How to use
+[Click here](http://13.59.189.58) to join a live version of it.
+
+## How to use locally
 
 ```
-$ cd socket.io
-$ npm install
-$ cd examples/chat
 $ npm install
 $ npm start
+$ npm run start:dev
 ```
 
-And point your browser to `http://localhost:3000`. Optionally, specify
-a port by supplying the `PORT` env variable.
+This runs the express backend server and a webpack dev server for the
+frontend bit.
 
-## Features
+And point your browser to [http://localhost:8080](http://localhost:8080).
+
+You can alternatively run the application within a Docker container as
+well.
+
+## Features (same as the original socket.io example)
 
 - Multiple users can join a chat room by each entering a unique username
 on website load.
