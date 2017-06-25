@@ -63,6 +63,16 @@ const withSocket = ({
           this.setState(updater, onUpdate);
         });
       });
+
+      Object.keys(cbs).forEach((event) => {
+        if (event in listeners) {
+          return;
+        }
+        this.socket.on(event, (data) => {
+          const callback = cbs[event];
+          callback(this.mergeProps(this.state.props), data);
+        });
+      });
     }
 
     componentWillUnmount() {
@@ -78,6 +88,7 @@ const withSocket = ({
     mergeProps(nextProps) {
       const updateProps = (nP) => this.update(nP);
       return {
+        ...this.props,
         ...nextProps,
         ...mapEmit((...args) => this.emit(...args), { ...nextProps, updateProps }),
         updateProps

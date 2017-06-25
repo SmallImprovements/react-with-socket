@@ -267,5 +267,75 @@ describe('withSocket', () => {
       expect(spy).to.have.been.calledTwice;
     });
   });
+
+  it('allows to define callbacks for socket events', () => {
+    const callbackSpy = sinon.spy();
+    const spy = spyComponent();
+    setSocketConstructor(mockSocketConstructor);
+    const testData = { x: 1 };
+    const comp = withSocket({
+      callbacks: () => ({
+        test: () => callbackSpy()
+      })
+    })(spy);
+
+    const rendered = render(comp, {});
+
+    expect(spy).to.have.been.calledOnce;
+
+    rendered.socket.trigger('test', testData);
+
+    expect(callbackSpy).to.have.been.called;
+  });
+
+  it('callbacks are called even if a data mapper is present for same event', () => {
+    const callbackSpy = sinon.spy();
+    const spy = spyComponent();
+    setSocketConstructor(mockSocketConstructor);
+    const testData = { x: 1 };
+    const comp = withSocket({
+      mapData: () => ({
+        test: () => ({})
+      }),
+      callbacks: () => ({
+        test: () => callbackSpy()
+      })
+    })(spy);
+
+    const rendered = render(comp, {});
+
+    expect(spy).to.have.been.calledOnce;
+
+    rendered.socket.trigger('test', testData);
+
+    expect(callbackSpy).to.have.been.calledOnce;
+  });
+
+  it('callbacks receive all props and data', () => {
+    const callbackSpy = sinon.spy();
+    const spy = spyComponent();
+    setSocketConstructor(mockSocketConstructor);
+    const testData = { x: 1 };
+    const origProps = { y: 2 };
+    const comp = withSocket({
+      mapData: () => ({
+        test: () => ({})
+      }),
+      callbacks: () => ({
+        test: (props, data) => callbackSpy(props, data)
+      })
+    })(spy);
+
+    const rendered = render(comp, origProps);
+
+    expect(spy).to.have.been.calledOnce;
+
+    rendered.socket.trigger('test', testData);
+
+    expect(callbackSpy).to.have.been.calledWith(
+      sinon.match(origProps),
+      sinon.match(testData)
+    );
+  });
 });
 
