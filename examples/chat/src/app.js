@@ -27,45 +27,45 @@ const initialState = {
 };
 
 const mapData = () => ({
-  'new message': ({ username, message }, { messages }) => ({
+  'new message': ({ messages }, { username, message }) => ({
     messages: [...messages, toMsg(username, message)]
   }),
-  'login': ({ username, numUsers }, { messages }) => ({
+  'login': ({ messages }, { username, numUsers }) => ({
     connected: true,
     username,
     numUsers,
     messages: [...messages, toLogMsg('Welcome to this demo!')]
   }),
-  'user joined': ({ username, numUsers }, { messages }) => ({
+  'user joined': ({ messages }, { username, numUsers }) => ({
     messages: [...messages, toLogMsg(`${username} joined`)],
     numUsers
   }),
-  'user left': ({ username, numUsers }, { messages, typingUsers }) => ({
+  'user left': ({ messages, typingUsers }, { username, numUsers }) => ({
     messages: [...messages, toLogMsg(`${username} left`)],
     numUsers,
     typingUsers: omit(username, typingUsers)
   }),
-  'typing': ({ username }, { typingUsers }) => ({
+  'typing': ({ typingUsers }, { username }) => ({
     typingUsers: { ...typingUsers, [username]: true }
   }),
-  'stop typing': ({ username }, { typingUsers }) => ({
+  'stop typing': ({ typingUsers }, { username }) => ({
     typingUsers: omit(username, typingUsers)
   }),
-  'disconnect': (_, { messages }) => ({
+  'disconnect': ({ messages }) => ({
     connected: false,
     messages: [...messages, toLogMsg(`you have been disconnected`)]
   }),
-  'reconnect': (_, { messages }) => ({
+  'reconnect': ({ messages }) => ({
     connected: true,
     messages: [...messages, toLogMsg('you have been reconnected')]
   }),
-  'reconnect_error': (_, { messages }) => ({
+  'reconnect_error': ({ messages }) => ({
     messages: [...messages, toLogMsg('attempt to reconnect has failed')]
   })
 });
 
 const callbacks = () => ({
-  reconnect: (_, { actions, username }) => { if (username) { actions.login(username); } }
+  reconnect: ({ actions, username }) => { if (username) { actions.login(username); } }
 });
 
 const mapEmit = (emit, props) => ({

@@ -49,14 +49,14 @@ const withSocket = ({
       Object.keys(listeners).forEach((event) => {
         this.socket.on(event, (data) => {
           const updater = (prevState) => {
-            const nextProps = listeners[event](data, { ...this.props, ...prevState.props });
+            const nextProps = listeners[event]({ ...this.props, ...prevState.props }, data);
             return mergeState(prevState, nextProps);
           };
 
           const onUpdate = () => {
             const callback = cbs[event];
             if (callback) {
-              callback(data, this.mergeProps(this.state.props));
+              callback(this.mergeProps(this.state.props), data);
             }
           };
 

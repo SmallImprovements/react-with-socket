@@ -215,7 +215,7 @@ describe('withSocket', () => {
     const testData = { x: 1 };
     const comp = withSocket({
       mapData: () => ({
-        test: (data) => ({ mappedData: data })
+        test: (state, data) => ({ mappedData: data })
       })
     })(spy);
 

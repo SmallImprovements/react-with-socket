@@ -14,7 +14,6 @@ export default class EmptyFormInput extends Component {
       event.stopPropagation();
       if (value) {
         this.props.onSubmit(value);
-        console.log('removal');
         this.setState({ value: '' });
       }
     };
