@@ -1,7 +1,7 @@
 import { Component } from 'react';
-import EmptyFormInput from '../EmptyFormInput';
+import EmptyFormInput from './EmptyFormInput';
 
-class ChatInput extends Component {
+export default class ChatInput extends Component {
   type() {
     const { typing, typingTimeout } = this;
     if (!typing) { this.props.onType(true); }

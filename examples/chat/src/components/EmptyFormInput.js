@@ -2,11 +2,12 @@ import { Component } from 'react';
 
 export default class EmptyFormInput extends Component {
   constructor() {
+    super();
     this.state = { value: '' };
   }
   render() {
     const { value } = this.state;
-    const { placeholder, onSubmit, onChange = noop } = this.props;
+    const { placeholder, onChange = noop } = this.props;
     const onSubmit = (event) => {
       event.preventDefault();
       if (value) {

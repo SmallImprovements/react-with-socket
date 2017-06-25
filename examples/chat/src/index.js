@@ -34,7 +34,7 @@ const initialState = {
   connected: false,
   username: '',
   messages: [],
-  typingUsers: {}
+  typingUsers: {},
   numUsers: 0
 };
 
@@ -49,11 +49,11 @@ const mapData = () => ({
     messages: [...messages, toLogMsg('Welcome to this demo!')]
   }),
   'user joined': ({ username, numUsers }, { messages }) => ({
-    messages: [...messages, toLogMsg(`${username} joined`)]
-    numUsers,
+    messages: [...messages, toLogMsg(`${username} joined`)],
+    numUsers
   }),
   'user left': ({ username, numUsers }, { messages, typingUsers }) => ({
-    messages: [...messages, toLogMsg(`${username} left`)]
+    messages: [...messages, toLogMsg(`${username} left`)],
     numUsers,
     typingUsers: omit(username, typingUsers)
   }),
@@ -64,7 +64,7 @@ const mapData = () => ({
     typingUsers: omit(username, typingUsers)
   }),
   'disconnect': (_, { messages }) => ({
-    connected: false
+    connected: false,
     messages: [...messages, toLogMsg(`you have been disconnected`)]
   }),
   'reconnect': (_, { messages }) => ({
@@ -110,7 +110,7 @@ const ConnectedApp = withSocket({
   return <Chat messages={ messages } typingUsers={ typingUsers } onType={type} onSend={sendMessage} />
 });
 
-function Login({ onSubmit }) => {
+function Login({ onSubmit }) {
   return (
     <EmptyFormInput onSubmit={onSubmit} />
   );
@@ -143,8 +143,8 @@ function TypingUsers({ typingUsers }) {
   const getText = () => {
     const count = typingUsers.length;
     if (!count) { return ''; }
-    if (count === 1) { return `${typingUsers[0] is typing}`; }
-    if (count < 4) { return `${typingUsers.join(', ') are typing}`; }
+    if (count === 1) { return `${typingUsers[0]} is typing}`; }
+    if (count < 4) { return `${typingUsers.join(', ')} are typing}`; }
     return `${count} users are typing`;
   }
   return <div>{ getText() }</div>;
