@@ -87,11 +87,10 @@ const withSocket = ({
 
     mergeProps(nextProps) {
       const updateProps = (nP) => this.update(nP);
+      const props = { ...this.props, ...nextProps, updateProps };
       return {
-        ...this.props,
-        ...nextProps,
-        ...mapEmit((...args) => this.emit(...args), { ...nextProps, updateProps }),
-        updateProps
+        ...props,
+        ...mapEmit((...args) => this.emit(...args), { ...props })
       };
     }
 
